@@ -26,7 +26,7 @@ int main(int argc, char** argv)
   vector<Vec3f> circles;
 
   /// Apply the Hough Transform to find the circles
-  HoughCircles( src_gray, circles, CV_HOUGH_GRADIENT, 1, src_gray.rows/8, 2, 32.0, 10, 100 );
+  HoughCircles( src_gray, circles, CV_HOUGH_GRADIENT, 1, src_gray.rows/16, 2, 32.0, 10, 100 );
 
   /// Draw the circles detected
   for( size_t i = 0; i < circles.size(); i++ )
