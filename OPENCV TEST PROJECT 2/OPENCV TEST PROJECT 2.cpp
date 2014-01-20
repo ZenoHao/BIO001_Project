@@ -11,10 +11,9 @@ using namespace cv;
 int main(int argc, char** argv)
 {
 	Mat src, src_gray;
-
 	/// Read the image
 	src = imread( argv[1], 1 );
-
+	Mat original = imread( argv[1], 1 );
 	if( !src.data )
 	{ return -1; }
 	/// Apply the Hough Transform to find the circles
@@ -33,6 +32,7 @@ int main(int argc, char** argv)
 			// img.at<cv::Vec3b>(i,j)[idx] += adds_constant_value;
 		}
 	}
+
 
 	threshold( src, src, 8, 255, 0 );
 	// HSV back to BGR
@@ -60,7 +60,7 @@ int main(int argc, char** argv)
 	params.filterByColor = false;
 	params.filterByCircularity = false;
 	params.filterByArea = true;
-	params.minArea = 100;
+	params.minArea = src.rows/30*src.rows/30;
 	params.maxArea = 50000.0f;
 	// ... any other params you don't want default value
 
@@ -75,14 +75,14 @@ int main(int argc, char** argv)
 	// extract the x y coordinates of the keypoints:
 	for( size_t i = 0; i < keypoints.size(); i++ ){
 		Point center(keypoints[i].pt.x,keypoints[i].pt.y);
-		circle( src_gray, center, 3, Scalar(0,255,0), 5, 8, 0 );
+		circle( original, center, 3, Scalar(0,255,255), 5, 8, 0 );
 	}
 	Mat dst;
 	Size size(src_gray.cols/2, src_gray.rows/2);
-	resize(src_gray, dst, size, 0, 0, 1);
-		//Point center(src.cols/2, src.rows/2);
-		//circle( src, center, 3, Scalar(0,255,0), -1, 8, 0 );
+	resize(original, dst, size, 0, 0, 1);
 	imshow( "Blob Detection Test", dst );
+	resize(src_gray, dst, size, 0, 0, 1);
+	imshow( "Threshold applied", dst );
 
 	/*
 	/// Show your results
