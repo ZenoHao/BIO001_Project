@@ -74,7 +74,6 @@ Global
 		{124F6BF0-9145-481B-96A2-91F58C7BE29E}.Release|Win32.ActiveCfg = Release|Win32
 		{124F6BF0-9145-481B-96A2-91F58C7BE29E}.Release|Win32.Build.0 = Release|Win32
 		{124F6BF0-9145-481B-96A2-91F58C7BE29E}.Release|x64.ActiveCfg = Release|x64
-		{124F6BF0-9145-481B-96A2-91F58C7BE29E}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

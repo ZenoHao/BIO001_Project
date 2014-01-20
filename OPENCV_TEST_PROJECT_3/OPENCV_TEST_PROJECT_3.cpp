@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <opencv/cv.h>
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include <stdlib.h>
@@ -7,63 +8,52 @@
 using namespace cv;
 
 /// Global variables
-
-Mat src, src_gray;
-Mat dst, detected_edges;
-
-int edgeThresh = 1;
-int lowThreshold;
-int const max_lowThreshold = 100;
-int ratio = 3;
-int kernel_size = 3;
-char* window_name = "Edge Map";
-
-/**
- * @function CannyThreshold
- * @brief Trackbar callback - Canny thresholds input with a ratio 1:3
- */
-void CannyThreshold(int, void*)
+int main(int argc, char** argv)
 {
-  /// Reduce noise with a kernel 3x3
-  blur( src_gray, detected_edges, Size(3,3) );
+    IplImage* img = NULL;
 
-  /// Canny detector
-  Canny( detected_edges, detected_edges, lowThreshold, lowThreshold*ratio, kernel_size );
+    if ((img = cvLoadImage(argv[1]))== 0)
+    {
+        printf("cvLoadImage failed\n");
+    }
 
-  /// Using Canny's output as a mask, we display our result
-  dst = Scalar::all(0);
+    IplImage* gray = cvCreateImage(cvGetSize(img), IPL_DEPTH_8U, 1);
+    CvMemStorage* storage = cvCreateMemStorage(0);
 
-  src.copyTo( dst, detected_edges);
-  imshow( window_name, dst );
- }
+    cvCvtColor(img, gray, CV_BGR2GRAY);
+
+    // This is done so as to prevent a lot of false circles from being detected
+    cvSmooth(gray, gray, CV_GAUSSIAN, 7, 7);
+
+    IplImage* canny = cvCreateImage(cvGetSize(img),IPL_DEPTH_8U,1);
+    IplImage* rgbcanny = cvCreateImage(cvGetSize(img),IPL_DEPTH_8U,3);
+    cvCanny(gray, canny, 50, 100, 3);
+
+    CvSeq* circles = cvHoughCircles(gray, storage, CV_HOUGH_GRADIENT, 1, gray->height/3, 250, 100);
+    cvCvtColor(canny, rgbcanny, CV_GRAY2BGR);
+
+    for (size_t i = 0; i < circles->total; i++)
+    {
+         // round the floats to an int
+         float* p = (float*)cvGetSeqElem(circles, i);
+         cv::Point center(cvRound(p[0]), cvRound(p[1]));
+         int radius = cvRound(p[2]);
+
+         // draw the circle center
+         cvCircle(rgbcanny, center, 3, CV_RGB(0,255,0), -1, 8, 0 );
+
+         // draw the circle outline
+         cvCircle(rgbcanny, center, radius+1, CV_RGB(0,0,255), 2, 8, 0 );
+
+         printf("x: %d y: %d r: %d\n",center.x,center.y, radius);
+    }
 
 
-/** @function main */
-int main( int argc, char** argv )
-{
-  /// Load an image
-  src = imread( argv[1] );
+    cvNamedWindow("circles", 1);
+    cvShowImage("circles", rgbcanny);
 
-  if( !src.data )
-  { return -1; }
+    cvSaveImage("out.png", rgbcanny);
+    cvWaitKey(0);
 
-  /// Create a matrix of the same type and size as src (for dst)
-  dst.create( src.size(), src.type() );
-
-  /// Convert the image to grayscale
-  cvtColor( src, src_gray, CV_BGR2GRAY );
-
-  /// Create a window
-  namedWindow( window_name, CV_WINDOW_AUTOSIZE );
-
-  /// Create a Trackbar for user to enter threshold
-  createTrackbar( "Min Threshold:", window_name, &lowThreshold, max_lowThreshold, CannyThreshold );
-
-  /// Show the image
-  CannyThreshold(0, 0);
-
-  /// Wait until user exit program by pressing a key
-  waitKey(0);
-
-  return 0;
-  }
+    return 0;
+}

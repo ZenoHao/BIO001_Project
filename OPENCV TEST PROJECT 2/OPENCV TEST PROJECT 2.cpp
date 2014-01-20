@@ -1,61 +1,60 @@
 #include "stdafx.h"
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
+#include "opencv2/highgui/highgui.hpp"
+#include <opencv2/features2d/features2d.hpp>
+#include "opencv2/imgproc/imgproc.hpp"
 #include <iostream>
+#include <stdio.h>
 
 using namespace cv;
 
-double alpha; /**< Simple contrast control */
-int beta;  /**< Simple brightness control */
-
-int main( int argc, char** argv )
+/** @function main */
+int main(int argc, char** argv)
 {
- /// Read image given by user
- Mat image = imread( argv[1] );
- Mat new_image = Mat::zeros( image.size(), image.type() );
- 
- /// Initialize values
- std::cout<<" Basic Linear Transforms "<<std::endl;
- std::cout<<"-------------------------"<<std::endl;
- std::cout<<"* Enter the alpha value [1.0-3.0]: ";std::cin>>alpha;
- /*
- std::cout<<"* Enter the beta value [0-100]: "; std::cin>>beta;
+	Mat src, src_gray;
 
- /// Do the operation new_image(i,j) = alpha*image(i,j) + beta
- 
- for( int y = 0; y < image.rows; y++ )
-    { for( int x = 0; x < image.cols; x++ )
-         { for( int c = 0; c < 3; c++ )
-              {
-      new_image.at<Vec3b>(y,x)[c] =
-         saturate_cast<uchar>( alpha*( image.at<Vec3b>(y,x)[c] ) + beta );
-             }
-    }
-    }
-*/
- for (int i=0; i < image.rows ; i++)
-{
-      for(int j=0; j < image.cols; j++)
-      {
-            // You need to check this, but I think index 1 is for saturation, but it might be 0 or 2
-            int idx = 1;
-            new_image.at<cv::Vec3b>(i,j)[idx] = alpha;
+	/// Read the image
+	src = imread( argv[1], 1 );
 
-            // or:
-            // img.at<cv::Vec3b>(i,j)[idx] += adds_constant_value;
-      }
+	if( !src.data )
+	{ return -1; }
+	/// Apply the Hough Transform to find the circles
+	// HoughCircles( src_gray, circles, CV_HOUGH_GRADIENT, 1, src_gray.rows/16, 2, 32.0, 10, 100 );
+	SimpleBlobDetector blob;
+
+	cv::SimpleBlobDetector::Params params;
+	params.minDistBetweenBlobs = src.rows/16;
+	params.filterByInertia = false;
+	params.filterByConvexity = false;
+	params.filterByColor = false;
+	params.filterByCircularity = false;
+	params.filterByArea = false;
+	params.minArea = 0;
+	params.maxArea = 500.0f;
+	// ... any other params you don't want default value
+
+	// set up and create the detector using the parameters
+	cv::Ptr<cv::FeatureDetector> blob_detector = new cv::SimpleBlobDetector(params);
+	blob_detector->create("SimpleBlob");
+
+	// detect!
+	vector<cv::KeyPoint> keypoints;
+	blob_detector->detect(src, keypoints);
+
+	// extract the x y coordinates of the keypoints:
+	for( size_t i = 0; i < keypoints.size(); i++ ){
+		Point center(keypoints[i].pt.x,keypoints[i].pt.y);
+		circle( src, center, 3, Scalar(0,255,0), 1, 8, 0 );
+	}
+		//Point center(src.cols/2, src.rows/2);
+		//circle( src, center, 3, Scalar(0,255,0), -1, 8, 0 );
+	imshow( "Blob Detection Test", src );
+
+	/*
+	/// Show your results
+	namedWindow( "Blob detection", CV_WINDOW_AUTOSIZE );
+	imshow( "Blob detection", src );
+	*/
+
+	waitKey(0);
+	return 0;
 }
-
- /// Create Windows
- namedWindow("Original Image", 1);
- namedWindow("New Image", 1);
-
- /// Show stuff
- imshow("Original Image", image);
- imshow("New Image", new_image);
-
- /// Wait until user press some key
- waitKey();
- return 0;
-}
-
