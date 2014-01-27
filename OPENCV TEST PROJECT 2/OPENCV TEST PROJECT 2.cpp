@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "opencv2/highgui/highgui.hpp"
+#include <opencv2/highgui/highgui.hpp>
 #include <opencv2/features2d/features2d.hpp>
-#include "opencv2/imgproc/imgproc.hpp"
+#include <opencv2/imgproc/imgproc.hpp>
 #include <iostream>
 #include <stdio.h>
 
@@ -13,32 +13,29 @@ int main(int argc, char** argv)
 	Mat src, src_gray;
 	/// Read the image
 	src = imread( argv[1], 1 );
-	Mat original = imread( argv[1], 1 );
+	// Copy is used to mark detected blobs without using original image. 
+	// This may be over precautionary and subject to change
+	Mat copy = imread( argv[1], 1 );
 	if( !src.data )
 	{ return -1; }
-	/// Apply the Hough Transform to find the circles
-	// HoughCircles( src_gray, circles, CV_HOUGH_GRADIENT, 1, src_gray.rows/16, 2, 32.0, 10, 100 );
+
+	// following commented code may be excess
+	/*
 	cvtColor(src, src, CV_BGR2HSV);    
 
 	for (int i=0; i < src.rows ; i++)
 	{
 		for(int j=0; j < src.cols; j++)
 		{
-			// You need to check this, but I think index 1 is for saturation, but it might be 0 or 2
 			int idx = 1;
 			src.at<cv::Vec3b>(i,j)[idx] = 5;
-
-			// or:
-			// img.at<cv::Vec3b>(i,j)[idx] += adds_constant_value;
 		}
 	}
-
+	*/
 
 	threshold( src, src, 8, 255, 0 );
 	// HSV back to BGR
-	cvtColor(src, src, CV_HSV2BGR);
-
-	Mat img(200, 300, CV_8UC1);
+	// cvtColor(src, src, CV_HSV2BGR);
 
 	Mat saturated;
 
@@ -46,7 +43,6 @@ int main(int argc, char** argv)
 	double scale = 1;
 
 	// what it does here is dst = (uchar) ((double)src*scale+saturation);
-	img.convertTo(saturated, CV_8UC1, scale, saturation);
 	cvtColor( src, src_gray, CV_BGR2GRAY );
 
 	/// Reduce the noise so we avoid false circle detection
@@ -61,7 +57,7 @@ int main(int argc, char** argv)
 	params.filterByCircularity = false;
 	params.filterByArea = true;
 	params.minArea = src.rows/30*src.rows/30;
-	params.maxArea = 50000.0f;
+	params.maxArea = src.rows/2*src.rows/2;
 	// ... any other params you don't want default value
 
 	// set up and create the detector using the parameters
@@ -75,11 +71,11 @@ int main(int argc, char** argv)
 	// extract the x y coordinates of the keypoints:
 	for( size_t i = 0; i < keypoints.size(); i++ ){
 		Point center(keypoints[i].pt.x,keypoints[i].pt.y);
-		circle( original, center, 3, Scalar(0,255,255), 5, 8, 0 );
+		circle( copy, center, 3, Scalar(0,0,255), 5, 8, 0 );
 	}
 	Mat dst;
 	Size size(src_gray.cols/2, src_gray.rows/2);
-	resize(original, dst, size, 0, 0, 1);
+	resize(copy, dst, size, 0, 0, 1);
 	imshow( "Blob Detection Test", dst );
 	resize(src_gray, dst, size, 0, 0, 1);
 	imshow( "Threshold applied", dst );

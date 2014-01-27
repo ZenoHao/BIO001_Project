@@ -1,6 +1,6 @@
 #include "stdafx.h"
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 #include <iostream>
 #include <stdio.h>
 
@@ -33,7 +33,7 @@ int main(int argc, char** argv)
 		}
 	}
 
-	threshold( src, src, 15, 255, 0 );
+	threshold( src, src, 8, 255, 0 );
 	// HSV back to BGR
 	cvtColor(src, src, CV_HSV2BGR);
 
@@ -69,8 +69,10 @@ int main(int argc, char** argv)
 	}
 
 	/// Show your results
-	namedWindow( "Hough Circle Transform Demo", CV_WINDOW_AUTOSIZE );
-	imshow( "Hough Circle Transform Demo", src );
+	Mat dst;
+	Size size(src.cols/2, src.rows/2);
+	resize(src, dst, size, 0, 0, 1);
+	imshow( "Hough Circle Transform Demo", dst );
 
 	waitKey(0);
 	return 0;
