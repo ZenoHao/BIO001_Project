@@ -19,8 +19,6 @@ int main(int argc, char** argv)
 	if( !src.data )
 	{ return -1; }
 
-	// following commented code may be excess
-	/*
 	cvtColor(src, src, CV_BGR2HSV);    
 
 	for (int i=0; i < src.rows ; i++)
@@ -31,11 +29,10 @@ int main(int argc, char** argv)
 			src.at<cv::Vec3b>(i,j)[idx] = 5;
 		}
 	}
-	*/
 
 	threshold( src, src, 8, 255, 0 );
 	// HSV back to BGR
-	// cvtColor(src, src, CV_HSV2BGR);
+	cvtColor(src, src, CV_HSV2BGR);
 
 	Mat saturated;
 
