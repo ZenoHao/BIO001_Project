@@ -1,10 +1,12 @@
-#include "stdafx.h"
+//#include "stdafx.h"
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/features2d/features2d.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <iostream>
 #include <stdio.h>
+#include <boost/filesystem.hpp>
 
+using namespace std;
 using namespace cv;
 
 /** @function main */
@@ -30,7 +32,7 @@ int main(int argc, char** argv)
 		}
 	}
 
-	threshold( src, src, 8, 255, 0 );
+	threshold( src, src, 12, 255, 0 );
 	// HSV back to BGR
 	cvtColor(src, src, CV_HSV2BGR);
 
