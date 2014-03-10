@@ -1,10 +1,10 @@
-//#include "stdafx.h"
+#include "stdafx.h"
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/features2d/features2d.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <iostream>
 #include <stdio.h>
-#include <boost/filesystem.hpp>
+//#include <boost/filesystem.hpp>
 
 using namespace std;
 using namespace cv;

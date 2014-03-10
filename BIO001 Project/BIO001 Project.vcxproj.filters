@@ -15,11 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\..\..\opencv\sources\samples\cpp\contours2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
     <Image Include="..\..\..\..\..\..\..\opencv\sources\samples\cpp\board.jpg">
       <Filter>Resource Files</Filter>
     </Image>
