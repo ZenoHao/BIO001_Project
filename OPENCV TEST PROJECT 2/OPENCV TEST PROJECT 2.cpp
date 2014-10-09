@@ -1,4 +1,6 @@
 #include "stdafx.h"
+#include <boost/regex.hpp>
+#include <boost/filesystem.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/features2d/features2d.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -12,11 +14,16 @@ using namespace cv;
 /** @function main */
 int main(int argc, char** argv)
 {
+	for (boost::filesystem::recursive_directory_iterator end, dir("./");
+		dir != end; ++dir) {
+		cout << *dir << std::endl;
+	}
 	Mat src, src_gray;
 	/// Read the image
 	src = imread( argv[1], 1 );
 	// Copy is used to mark detected blobs without using original image. 
 	// This may be over precautionary and subject to change
+
 	Mat copy = imread( argv[1], 1 );
 	if( !src.data )
 	{ return -1; }
@@ -78,12 +85,6 @@ int main(int argc, char** argv)
 	imshow( "Blob Detection Test", dst );
 	resize(src_gray, dst, size, 0, 0, 1);
 	imshow( "Threshold applied", dst );
-
-	/*
-	/// Show your results
-	namedWindow( "Blob detection", CV_WINDOW_AUTOSIZE );
-	imshow( "Blob detection", src );
-	*/
 
 	waitKey(0);
 	return 0;
